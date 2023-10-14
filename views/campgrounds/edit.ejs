@@ -1,0 +1,68 @@
+<% layout('layouts/boilerplate') %>
+
+
+    <div class="row">
+        <h1 class="text-center">Edit Campground</h1>
+        <div class="col-6 offset-3">
+
+            <form action="/campgrounds/<%= campground._id %>?_method=PUT" method="POST" novalidate
+                class="validated-form">
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title</label>
+                    <input type="text" class="form-control" id="title" name="campground[title]"
+                        value="<%= campground.title %>" required>
+                </div>
+                <div class="mb-3">
+                    <label for="location" class="form-label">Location</label>
+                    <input type="text" class="form-control" id="location" name="campground[location]"
+                        value="<%= campground.location %>" required>
+                </div>
+                <div class="mb-3">
+                    <label for="image" class="form-label">Image URL</label>
+                    <input type="text" class="form-control" id="image" name="campground[image]"
+                        value="<%= campground.image %>" required>
+                </div>
+                <div class="mb-3">
+                    <label for="price" class="form-label">Price</label>
+                </div>
+                <div class="input-group">
+                    <span class=" input-group-text" id="price-label">$</span>
+                    <input type="text" class="form-control" placeholder="0.00" aria-label="Username"
+                        aria-describedby="price-label" name="campground[price]" value="<%= campground.price %>"
+                        required>
+                </div>
+                <!-- FIXME: Not loading Description and field valdiates with no text -->
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea type="text" class="form-control" id="description"
+                        name="campground[description]"><%= campground.description %></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <button class="btn btn-success">Add Campground</button>
+                </div>
+            </form>
+            <a href="/campgrounds">Edit Campgrounds</a>
+        </div>
+    </div>
+
+
+
+
+
+
+
+    <!-- 
+    <h1>Edit Campground</h1>
+    <form action="/campgrounds/<%= campground._id %>?_method=PUT" method="POST">
+        <div>
+            <label for="title">Title</label>
+            <input type="text" id="title" name="campground[title]" value="<%= campground.title %>">
+        </div>
+        <div>
+            <label for="location">Location</label>
+            <input type="text" id="location" name="campground[location]" value="<%= campground.location %>">
+        </div>
+        <button>Save Campground</button>
+    </form>
+    <a href="/campgrounds">All Campgrounds</a> -->
