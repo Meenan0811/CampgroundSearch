@@ -9,10 +9,16 @@ const catchAsync = require('./helpers/catchAsync');
 // const joi = require('joi');
 const ExpressError = require('./helpers/ExpressError');
 // const { campgroundSchema, reviewSchema } = require('./schemas')
-const campgrounds = require('./routes/campgrounds');
-const reviews = require('./routes/reviews');
+const campgroundsRouter = require('./routes/campgrounds');
+const reviewsRouter = require('./routes/reviews');
+const userRouter = require('./routes/user')
 const session = require('express-session');
 const flash = require('connect-flash');
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const User = require('./models/user');
+
+
 
 
 
@@ -51,6 +57,14 @@ const sessionConfig = {
 app.use(session(sessionConfig));
 app.use(flash());
 
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+
 
 //MiddleWare to display Flash Alerts
 app.use((req, res, next) => {
@@ -59,9 +73,16 @@ app.use((req, res, next) => {
     next();
 })
 
+app.get('/fake', async (req, res) => {
+    const user = new User({ email: 'fake@gmai.com', username: 'fakeUser' });
+    const newUser = await User.register(user, 'password');
+    res.send(newUser);
+})
 
-app.use('/campgrounds', campgrounds);
-app.use('/campgrounds/:id/reviews', reviews);
+
+app.use('/campgrounds', campgroundsRouter);
+app.use('/campgrounds/:id/reviews', reviewsRouter);
+app.use('/', userRouter);
 
 //****************************************************
 //  VALIDATION - From validation using JOI library

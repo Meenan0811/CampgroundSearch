@@ -93,6 +93,7 @@ route.delete('/:id/delete', catchAsync(async (req, res) => {
     await Campground.findByIdAndDelete(id);
     req.flash('success', `Campground Succesfully deleted`);
     res.redirect('/campgrounds');
+
 }))
 
 
