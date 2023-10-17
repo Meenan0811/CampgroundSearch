@@ -2,14 +2,17 @@ const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 const Campground = require('./models/campground');
-const Review = require('./models/review')
+// const Review = require('./models/review')
 const methodOverride = require('method-override');
 const ejsMate = require('ejs-mate');
 const catchAsync = require('./helpers/catchAsync');
-const joi = require('joi');
+// const joi = require('joi');
 const ExpressError = require('./helpers/ExpressError');
-const { campgroundSchema, reviewSchema } = require('./schemas')
+// const { campgroundSchema, reviewSchema } = require('./schemas')
 const campgrounds = require('./routes/campgrounds');
+const reviews = require('./routes/reviews');
+const session = require('express-session');
+const flash = require('connect-flash');
 
 
 
@@ -29,7 +32,36 @@ app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
+app.use(express.static(path.join(__dirname, 'public')));
+
+
+//Creates Session Object with configuration settings
+const sessionConfig = {
+    secret: 'devSecret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true, //Default Setting
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+        maxAge: 1000 * 60 * 60 * 24 * 7
+    }
+    //TODO: - Production needs memory store set to mongoose
+    //store:
+}
+app.use(session(sessionConfig));
+app.use(flash());
+
+
+//MiddleWare to display Flash Alerts
+app.use((req, res, next) => {
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    next();
+})
+
+
 app.use('/campgrounds', campgrounds);
+app.use('/campgrounds/:id/reviews', reviews);
 
 //****************************************************
 //  VALIDATION - From validation using JOI library
