@@ -68,6 +68,9 @@ passport.deserializeUser(User.deserializeUser());
 
 //MiddleWare to display Flash Alerts
 app.use((req, res, next) => {
+    //Sets currUser value to the curruser if signed in, if not returns null
+    // res.locals.returnTo = req.originalUrl;
+    res.locals.currUser = req.user;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
     next();

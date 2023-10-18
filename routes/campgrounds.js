@@ -4,6 +4,7 @@ const catchAsync = require('../helpers/catchAsync');
 const ExpressError = require('../helpers/ExpressError');
 const Campground = require('../models/campground');
 const { campgroundSchema } = require('../schemas')
+const { isAuth } = require('../middleware');
 // const Review = require('../models/review')
 
 function validateCampground(req, res, next) {
@@ -38,11 +39,12 @@ route.get('/', catchAsync(async (req, res) => {
 //****************************************************
 //-NEW 
 //****************************************************
-route.get('/new', (req, res) => {
+route.get('/new', isAuth, (req, res) => {
+
     res.render('campgrounds/new')
 })
 
-route.post('/', validateCampground, catchAsync(async (req, res, next) => {
+route.post('/', isAuth, validateCampground, catchAsync(async (req, res, next) => {
     const campground = new Campground(req.body.campground);
     await campground.save();
     req.flash('success', 'New Campground created');
