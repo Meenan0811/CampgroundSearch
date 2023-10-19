@@ -4,7 +4,8 @@ const catchAsync = require('../helpers/catchAsync');
 const ExpressError = require('../helpers/ExpressError');
 const Campground = require('../models/campground');
 const { campgroundSchema } = require('../schemas')
-const { isAuth } = require('../middleware');
+const { isAuth, isAuthor } = require('../middleware');
+
 // const Review = require('../models/review')
 
 function validateCampground(req, res, next) {
@@ -46,7 +47,9 @@ route.get('/new', isAuth, (req, res) => {
 
 route.post('/', isAuth, validateCampground, catchAsync(async (req, res, next) => {
     const campground = new Campground(req.body.campground);
+    campground.author = req.user._id;
     await campground.save();
+    console.log('campground');
     req.flash('success', 'New Campground created');
     res.redirect(`/campgrounds/${campground._id}`)
 }))
@@ -71,18 +74,31 @@ route.post('/', isAuth, validateCampground, catchAsync(async (req, res, next) =>
 //****************************************************
 //-Edit
 //****************************************************
-route.get('/:id/edit', catchAsync(async (req, res) => {
+route.get('/:id/edit', isAuth, isAuthor, catchAsync(async (req, res) => {
     const { id } = req.params;
     const campground = await Campground.findById(id);
+    // if (campground.author.equals(req.user._id)) {
+    //     res.render('campgrounds/edit', { campground });
+    // } else {
+    //     console.log('else enetered')
+    //     req.flash('error', 'You do not have permission ')
+    //     res.redirect(`/campgrounds/${id}`)
+    // }
     res.render('campgrounds/edit', { campground });
 }))
 
-route.put('/:id', validateCampground, catchAsync(async (req, res) => {
+route.put('/:id', isAuth, isAuthor, validateCampground, catchAsync(async (req, res) => {
     const { id } = req.params;
-    const campground = await Campground.findByIdAndUpdate(id, req.body.campground, { runValidators: true, new: true });
-    const { name } = await Campground.findById(id);
-    req.flash('success', `${name} Campground Succesfully edited`);
-    res.redirect(`/campgrounds/${id}`);
+    const campground = await Campground.findById(id);
+    if (campground.author.equals(req.user._id)) {
+        const camp = await Campground.findByIdAndUpdate(id, req.body.campground, { runValidators: true, new: true });
+        const { name } = await Campground.findById(id);
+        req.flash('success', `${name} Campground Succesfully edited`);
+        res.redirect(`/campgrounds/${id}`);
+    } else {
+        req.flash('error', 'You must be signed in to perform this request');
+        res.redirect('/login')
+    }
 }))
 
 
@@ -102,7 +118,7 @@ route.delete('/:id/delete', catchAsync(async (req, res) => {
 
 route.get('/:id', catchAsync(async (req, res) => {
     const { id } = req.params;
-    const campground = await Campground.findById(id).populate('reviews');
+    const campground = await Campground.findById(id).populate('reviews').populate('author');
     if (!campground) {
         req.flash('error', 'Campground not found!');
         return res.redirect('/campgrounds');
