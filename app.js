@@ -87,6 +87,48 @@ app.use('/campgrounds', campgroundsRouter);
 app.use('/campgrounds/:id/reviews', reviewsRouter);
 app.use('/', userRouter);
 
+
+//****************************************************
+//  GET - receives request and sends response
+//****************************************************
+app.get('/', (req, res) => {
+    res.render('home');
+})
+
+
+app.get('/makecampground', catchAsync(async (req, res) => {
+    const camp = new Campground({ title: 'Backyard', description: 'cheap' });
+    await camp.save();
+    res.send(camp);
+}))
+
+
+//****************************************************
+//-ERROR HANDLING - 
+//****************************************************
+app.all('*', (req, res, next) => {
+    next(new ExpressError('Page Not Found', 404))
+})
+
+app.use((err, req, res, next) => {
+    const { statuscode = 500, message = 'None' } = err;
+    // res.status(statuscode).send(message)
+    if (!err.message) err.message = 'There was a Error';
+    res.render('errors', { err })
+})
+
+
+app.listen(3000, () => {
+    console.log('Port 3000: Listening')
+})
+
+
+
+
+//****************************************************
+//-
+//****************************************************
+
 //****************************************************
 //  VALIDATION - From validation using JOI library
 //****************************************************
@@ -111,23 +153,13 @@ app.use('/', userRouter);
 //         next();
 //     }
 // };
-//****************************************************
-//  GET - receives request and sends response
-//****************************************************
-app.get('/', (req, res) => {
-    res.render('home');
-})
+
 
 // app.get('/campgrounds', catchAsync(async (req, res) => {
 //     const campgrounds = await Campground.find({});
 //     res.render('campgrounds/index', { campgrounds });
 // }))
 
-app.get('/makecampground', catchAsync(async (req, res) => {
-    const camp = new Campground({ title: 'Backyard', description: 'cheap' });
-    await camp.save();
-    res.send(camp);
-}))
 
 // //****************************************************
 // //-NEW 
@@ -201,30 +233,3 @@ app.get('/makecampground', catchAsync(async (req, res) => {
 //     await Review.findByIdAndDelete(reviewId);
 //     res.redirect(`/campgrounds/${id}`);
 // })
-
-
-//****************************************************
-//-ERROR HANDLING - 
-//****************************************************
-app.all('*', (req, res, next) => {
-    next(new ExpressError('Page Not Found', 404))
-})
-
-app.use((err, req, res, next) => {
-    const { statuscode = 500, message = 'None' } = err;
-    // res.status(statuscode).send(message)
-    if (!err.message) err.message = 'There was a Error';
-    res.render('errors', { err })
-})
-
-
-app.listen(3000, () => {
-    console.log('Port 3000: Listening')
-})
-
-
-
-
-//****************************************************
-//-
-//****************************************************

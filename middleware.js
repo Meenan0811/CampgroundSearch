@@ -1,4 +1,8 @@
 const Campground = require("./models/campground");
+const review = require("./models/review");
+const { campgroundSchema } = require('./schemas');
+const { reviewSchema } = require('./schemas');
+const Review = require('./models/review');
 
 
 module.exports.isAuth = (req, res, next) => {
@@ -29,7 +33,37 @@ module.exports.isAuthor = async (req, res, next) => {
     next();
 }
 
+module.exports.validateCampground = (req, res, next) => {
 
+    const { error } = campgroundSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',');
+        throw new ExpressError(msg, 400);
+    } else {
+        next();
+    }
+};
+
+module.exports.validateReview = (req, res, next) => {
+
+    const { error } = reviewSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',');
+        throw new ExpressError(msg, 400);
+    } else {
+        next();
+    }
+};
+
+module.exports.isReviewAuthor = async (req, res, next) => {
+    const { id, reviewId } = req.params;
+    const review = await Review.findById(reviewId);
+    if (!review.author.equals(req.user._id)) {
+        req.flash('error', 'You do not  have permission');
+        return res.redirect(`/campgrounds/${id}`)
+    }
+    next();
+}
 
 
 //--------------Notes about upcoming code-----------------------
