@@ -1,3 +1,7 @@
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config();
+}
+
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
@@ -23,12 +27,15 @@ const User = require('./models/user');
 
 
 
+
 mongoose.connect('mongodb://localhost:27017/yelp-camp');
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'Connection Error:'));
 db.once('open', () => {
     console.log('Database Connected');
 });
+
+// console.log(process.env.CLOUDINARY_CLOUD_NAME, process.env.CLOUDINARY_KEY, process.env.CLOUDINARY_SECRET);
 
 const app = express();
 

@@ -4,7 +4,7 @@
         <h1 class="text-center">New Campground</h1>
         <div class="col-6 offset-3">
 
-            <form action="/campgrounds" method="POST" novalidate class="validated-form">
+            <form action="/campgrounds" method="POST" novalidate class="validated-form" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label for="title" class="form-label">Title</label>
                     <input type="text" class="form-control" id="title" name="campground[title]" required>
@@ -16,24 +16,30 @@
                     <label for="location" class="form-label">Location</label>
                     <input type="text" class="form-control" id="location" name="campground[location]" required>
                 </div>
-                <div class="mb-3">
+                <!-- <div class="mb-3">
+                    <input type="file" name="image" id="" multiple>
                     <label for="image" class="form-label">Image URL</label>
                     <input type="text" class="form-control" id="image" name="campground[image]" required>
-                </div>
+                </div> -->
+
                 <div class="mb-3">
                     <label for="price" class="form-label">Price</label>
-                </div>
-                <div class="input-group">
-                    <span class=" input-group-text" id="price-label">$</span>
-                    <input type="text" class="form-control" placeholder="0.00" aria-label="Username"
-                        aria-describedby="price-label" name="campground[price]" required>
+
+                    <div class="input-group">
+                        <span class=" input-group-text" id="price-label">$</span>
+                        <input type="text" class="form-control" placeholder="0.00" aria-label="Username"
+                            aria-describedby="price-label" name="campground[price]" required>
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label for="description" class="form-label">Description</label>
                     <textarea type="text" class="form-control" id="description" name="campground[description]"
                         required></textarea>
                 </div>
-
+                <div class="input-group mb-3">
+                    <input type="file" class="form-control" id="image" name="image" multiple>
+                    <label class="input-group-text" for="image">Upload</label>
+                </div>
                 <div class="mb-3">
                     <button class="btn btn-success">Add Campground</button>
                 </div>

@@ -5,6 +5,7 @@ const Campground = require('../models/campground');
 const { reviewSchema } = require('../schemas')
 const Review = require('../models/review')
 const { validateReview, isAuth, isReviewAuthor } = require('../middleware');
+const review = require('../controllers/review')
 
 //Create Router object, mergeParams allows params passed through to router object
 //ie... app.js file call to app.use('/campgrounds/:id/reviews', reviews) will not pass id param without
@@ -24,25 +25,9 @@ const reviewRoute = express.Router({ mergeParams: true });
 //     }
 // };
 
-reviewRoute.post('/', isAuth, validateReview, catchAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id);
-    const review = new Review(req.body.review);
-    review.author = req.user._id;
-    campground.reviews.push(review);
-    await review.save();
-    await campground.save();
-    req.flash('success', `Review Created!`);
-    res.redirect(`/campgrounds/${campground._id}`);
-    // res.send('Request Received');
-}))
+reviewRoute.post('/', isAuth, validateReview, catchAsync(review.pushReview))
 
-reviewRoute.delete('/:reviewId', isReviewAuthor, isAuth, catchAsync(async (req, res) => {
-    const { id } = req.params;
-    const { reviewId } = req.params;
-    await Campground.findByIdAndUpdate(id, { $pull: { review: reviewId } });
-    await Review.findByIdAndDelete(reviewId);
-    res.redirect(`/campgrounds/${id}`);
-}))
+reviewRoute.delete('/:reviewId', isReviewAuthor, isAuth, catchAsync(review.deleteReview))
 
 module.exports = reviewRoute;
 

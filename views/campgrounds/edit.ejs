@@ -6,7 +6,7 @@
         <div class="col-6 offset-3">
 
             <form action="/campgrounds/<%= campground._id %>?_method=PUT" method="POST" novalidate
-                class="validated-form">
+                class="validated-form" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label for="title" class="form-label">Title</label>
                     <input type="text" class="form-control" id="title" name="campground[title]"
@@ -17,25 +17,41 @@
                     <input type="text" class="form-control" id="location" name="campground[location]"
                         value="<%= campground.location %>" required>
                 </div>
-                <div class="mb-3">
-                    <label for="image" class="form-label">Image URL</label>
-                    <input type="text" class="form-control" id="image" name="campground[image]"
-                        value="<%= campground.image %>" required>
-                </div>
+                <!-- <div class="mb-3">
+                    <label for="image" class="form-label">Image:</label>
+                    <!-- <input type="text" class="form-control" id="image" name="campground[image]"
+                        value="<%= campground.image %>" required> 
+                    <input type="file" id="image" name="image" multiple>
+                </div> -->
                 <div class="mb-3">
                     <label for="price" class="form-label">Price</label>
+
+                    <div class="input-group">
+                        <span class=" input-group-text" id="price-label">$</span>
+                        <input type="text" class="form-control" placeholder="0.00" aria-label="Username"
+                            aria-describedby="price-label" name="campground[price]" value="<%= campground.price %>"
+                            required>
+                    </div>
                 </div>
-                <div class="input-group">
-                    <span class=" input-group-text" id="price-label">$</span>
-                    <input type="text" class="form-control" placeholder="0.00" aria-label="Username"
-                        aria-describedby="price-label" name="campground[price]" value="<%= campground.price %>"
-                        required>
-                </div>
-                <!-- FIXME: Not loading Description and field valdiates with no text -->
+
                 <div class="mb-3">
                     <label for="description" class="form-label">Description</label>
                     <textarea type="text" class="form-control" id="description"
                         name="campground[description]"><%= campground.description %></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="file" class="form-control" id="image" name="image" multiple>
+                    <label class="input-group-text" for="image">Upload</label>
+                </div>
+                <div class="mb-3">
+                    <% campground.images.forEach(function(img, i) { %>
+                        <img src="<%= img.url %>" alt="" class="img-thumbnail">
+                        <div class="form-check-inline">
+                            <input type="checkbox" name="deleteImages[]" id="image-<%= i %>"
+                                value="<%= img.filename %>">
+                        </div>
+                        <label for="image-<%= i %>">Delete?</label>
+                        <% }); %>
                 </div>
 
                 <div class="mb-3">

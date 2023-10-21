@@ -3,6 +3,7 @@ const review = require("./models/review");
 const { campgroundSchema } = require('./schemas');
 const { reviewSchema } = require('./schemas');
 const Review = require('./models/review');
+const ExpressError = require('./helpers/ExpressError');
 
 
 module.exports.isAuth = (req, res, next) => {

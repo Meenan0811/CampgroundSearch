@@ -11,9 +11,10 @@ module.exports.newCamp = (req, res) => {
 
 module.exports.addNew = async (req, res, next) => {
     const campground = new Campground(req.body.campground);
+    campground.images = req.files.map(f => ({ url: f.path, filename: f.filename }))
     campground.author = req.user._id;
     await campground.save();
-    console.log('campground');
+    console.log(campground);
     req.flash('success', 'New Campground created');
     res.redirect(`/campgrounds/${campground._id}`)
 }
@@ -33,16 +34,20 @@ module.exports.editCamp = async (req, res) => {
 
 module.exports.putEditCamp = async (req, res) => {
     const { id } = req.params;
-    const campground = await Campground.findById(id);
-    if (campground.author.equals(req.user._id)) {
-        const camp = await Campground.findByIdAndUpdate(id, req.body.campground, { runValidators: true, new: true });
-        const { name } = await Campground.findById(id);
-        req.flash('success', `${name} Campground Succesfully edited`);
-        res.redirect(`/campgrounds/${id}`);
-    } else {
-        req.flash('error', 'You must be signed in to perform this request');
-        res.redirect('/login')
-    }
+    // const campground = await Campground.findById(id);
+    const campground = await Campground.findByIdAndUpdate(id, req.body.campground, { runValidators: true, new: true });
+    const img = req.files.map(f => ({ url: f.path, filename: f.filename }));
+    campground.images.push(...img);
+    campground.save();
+    // if (campground.author.equals(req.user._id)) {
+    //     const camp = await Campground.findByIdAndUpdate(id, req.body.campground, { runValidators: true, new: true });
+    const name = campground.name;
+    req.flash('success', `${name} Campground Succesfully edited`);
+    res.redirect(`/campgrounds/${id}`);
+    // } else {
+    //     req.flash('error', 'You must be signed in to perform this request');
+    //     res.redirect('/login')
+    // }
 }
 
 module.exports.deleteCamp = async (req, res) => {

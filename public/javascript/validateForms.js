@@ -20,3 +20,5 @@
             }, false)
         })
 })()
+
+bsCustomFileInput.init();
